@@ -229,10 +229,10 @@ public class DepartureBoard {
 	 * @return A JSONArray containing Departures from given parameters. Returns null if any of stopId, date or time parameters are null. These are required!
 	 * @throws IOException
 	 */
-	public void executeRequest() throws IOException {
+	public JSONObject executeRequest() throws IOException {
 		String requestLink = buildRequestLink();
 		if(requestLink == null)
-			return ;
+			return null;
 		
 		HttpTransport trans = new NetHttpTransport();
 		
@@ -249,30 +249,8 @@ public class DepartureBoard {
 		req.setReadTimeout(300000);
 		HttpResponse resp = req.execute();
 		
-//		String jsonresponse = resp.parseAsString();
-//		String trimmedstring = "{" + jsonresponse.substring(jsonresponse.indexOf("\"Departure\""), jsonresponse.length()-1);
 
-//		System.out.println(trimmedstring);
-		
-//		JSONArray arr = new JSONObject(trimmedstring).getJSONArray("Departure");
-		JSONObject obj = new JSONObject(resp.parseAsString());
-		JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
-		PrintWriter writer = new PrintWriter("gbgcpendel.txt");
-		for(int i = 0; i < arr.length();i++) {
-			writer.println(arr.get(i).toString());
-		}
-		writer.close();
-
-	
-		
-//		PrintWriter writer = new PrintWriter("kbadeps.txt");
-//		writer.println(resp.parseAsString());
-//		writer.close();
-		
-//		String jsonresponse = resp.parseAsString();
-//		String trimmedstring = "{" + jsonresponse.substring(jsonresponse.indexOf("\"Departure\""), jsonresponse.length()-1);
-		
-//		return new JSONObject(trimmedstring).getJSONArray("Departure");
+		return new JSONObject(resp.parseAsString());
 	}
 	
 	

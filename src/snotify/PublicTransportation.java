@@ -220,7 +220,7 @@ public class PublicTransportation {
 	
 	public void printJourney() {
 		try {
-			PrintWriter writer = new PrintWriter(new File(this.journeyid + ".txt"));
+			PrintWriter writer = new PrintWriter(new File("C:\\Users\\John\\Desktop\\resor\\" + this.journeyid + ".txt"));
 			writer.println("Station\t" + "Försening");
 			for(int i = 0; i < stops.size(); i++)
 				writer.println(stops.get(i).toString() + "\t" + delays.get(i).toString());

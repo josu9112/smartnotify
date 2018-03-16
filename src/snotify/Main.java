@@ -15,6 +15,8 @@ import java.util.TimerTask;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GlobalPosition;
+import org.joda.time.LocalTime;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -34,8 +36,6 @@ public class Main {
 		secret = secret.substring(secret.indexOf(" ")+1);
 		scan.close();
 		Token token = new Token(id, secret);
-		DepartureBoard dep = new DepartureBoard(token);
-		
 
 		
 		/* Kod för att få ut alla linjer från en station, alla veckodagar*/
@@ -126,17 +126,70 @@ public class Main {
 		
 		//Brunnsparken 9021014001760000
 		//GBG C 9021014008000000
-		//KBA 9021014019351000
+		//KBA 9021014019110000
+		//Älvängen 9021014016611000
+		//Alingsås 9021014017510000
+		//Vänersborg 9021014080802000
+		
+		
+		ArrayList<String> stops = new ArrayList<String>();
+		stops.add("9021014008000000"); //GBG
+		stops.add("9021014019110000"); //KBA
+		stops.add("9021014016611000"); //Älvängen
+		stops.add("9021014017510000"); //Alingsås
+		stops.add("9021014080802000"); //Vänersborg
+		
+		ArrayList<Timer> timers = new ArrayList<Timer>();
+		
+		for(int i = 0; i < stops.size(); i++) {
+			DepartureBoard dep = new DepartureBoard(token);
+			dep.setStartId(stops.get(i));
+			dep.setTime(new LocalTime().getHourOfDay() + ":" + (new LocalTime().getMinuteOfHour()+2));
+			dep.setUseLongDistanceTrain(false);
+			dep.setUseRegionalTrain(false);
+			dep.setUseBus(false);
+			dep.setDate("2018-03-16");
+			dep.setTimeSpan(270);
+			JSONObject obj = dep.executeRequest();
+			JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+
+			for(int j = 0; j < arr.length(); j++) {
+				if(i == 0) {
+					String dir = arr.getJSONObject(j).getString("direction");
+					if(dir.equals("Kungsbacka") || dir.equals("Alingsås") || dir.equals("Älvängen")|| dir.equals("Vänersborg")) {
+						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
+						Timer timerTemp = new Timer();
+						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
+						timers.add(timerTemp);
+					}
+				}
+				else {
+					if(arr.getJSONObject(j).getString("direction").equals("Göteborg")) {
+						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
+						Timer timerTemp = new Timer();
+						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
+						timers.add(timerTemp);
+					}
+				}
+			}
+		}
+		
+		
+		
 //		DepartureBoard dep = new DepartureBoard(token);
-//		dep.setStartId("9021014008000000");
-//		dep.setTime("00:00");
+//		dep.setStartId("9021014019110000");
+//		dep.setTime("15:45");
 //		dep.setUseLongDistanceTrain(false);
 //		dep.setUseRegionalTrain(false);
 //		dep.setUseBus(false);
 //		dep.setDate("2018-03-16");
 //		dep.setTimeSpan(1440);
-//		dep.executeRequest();
-	
+//		JSONObject obj = dep.executeRequest();
+//		JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+//		for(int i = 0; i < arr.length(); i++) {
+//			System.out.println(arr.getJSONObject(i).toString());
+//		}
+		
 
 		
 //		JourneyDetail a = new JourneyDetail(token, "https://api.vasttrafik.se/bin/rest.exe/v2/journeyDetail?ref=240843%2F87851%2F871318%2F355378%2F80%3Fdate%3D2018-03-16%26station_evaId%3D8000016%26station_type%3Ddep%26format%3Djson%26");
@@ -147,7 +200,6 @@ public class Main {
 //		PublicTransportation cpt = new PublicTransportation(c);
 		
 		
-		System.out.println(token.getAccessToken());
 		
 //		Timer timerA = new Timer();
 //		timerA.schedule(new CheckJourney(apt), getDate(apt),30*1000);
