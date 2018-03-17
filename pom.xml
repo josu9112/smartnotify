@@ -38,7 +38,7 @@
 				<executions>
 					<execution>
 						<id>make-assembly</id>
-						<phase>package</phase> 
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -48,6 +48,11 @@
 		</plugins>
 	</build>
 	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
