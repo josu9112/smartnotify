@@ -24,12 +24,12 @@ public class CheckJourney extends TimerTask {
 			JSONArray arr = obj.getJSONObject("JourneyDetail").getJSONArray("Stop");
 			int whatStop = pt.getCurrentStop();
 			while(!arr.getJSONObject(whatStop).has("rtDepTime") && !arr.getJSONObject(whatStop).has("rtArrTime")) {
-				whatStop++;
-				if(whatStop > obj.getJSONObject("JourneyDetail").getJSONObject("JourneyType").getInt("routeIdxTo")) {
+				if(arr.getJSONObject(whatStop).getInt("routeIdx") == obj.getJSONObject("JourneyDetail").getJSONObject("JourneyType").getInt("routeIdxTo")) {
 					pt.printJourney();	//Journey ended, prints it out
 					this.cancel();
 					return;
 				}
+				whatStop++;
 				pt.setCurrentStop(whatStop);
 			}
 			int delay = calcTimeDifference(arr.getJSONObject(whatStop));

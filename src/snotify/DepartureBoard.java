@@ -249,6 +249,12 @@ public class DepartureBoard {
 		req.setReadTimeout(300000);
 		HttpResponse resp = req.execute();
 		
+		while(resp.getStatusCode()==401) {
+			token.renewToken();
+			req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
+			resp = req.execute();
+		}
+			
 
 		return new JSONObject(resp.parseAsString());
 	}

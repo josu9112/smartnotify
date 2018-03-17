@@ -1,5 +1,6 @@
 package snotify;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -122,8 +123,6 @@ public class Main {
 		
 		
 		
-		
-		
 		//Brunnsparken 9021014001760000
 		//GBG C 9021014008000000
 		//KBA 9021014019110000
@@ -148,11 +147,10 @@ public class Main {
 			dep.setUseLongDistanceTrain(false);
 			dep.setUseRegionalTrain(false);
 			dep.setUseBus(false);
-			dep.setDate("2018-03-16");
+			dep.setDate("2018-03-17");
 			dep.setTimeSpan(270);
 			JSONObject obj = dep.executeRequest();
 			JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
-
 			for(int j = 0; j < arr.length(); j++) {
 				if(i == 0) {
 					String dir = arr.getJSONObject(j).getString("direction");
