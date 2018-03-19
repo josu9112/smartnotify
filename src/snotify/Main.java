@@ -121,8 +121,6 @@ public class Main {
 		
 	
 		
-		
-		
 		//Brunnsparken 9021014001760000
 		//GBG C 9021014008000000
 		//KBA 9021014019110000
@@ -151,25 +149,30 @@ public class Main {
 			dep.setTimeSpan(270);
 			JSONObject obj = dep.executeRequest();
 			JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+			PrintWriter writer = new PrintWriter(new File(stops.get(i)+".txt"));
 			for(int j = 0; j < arr.length(); j++) {
 				if(i == 0) {
 					String dir = arr.getJSONObject(j).getString("direction");
 					if(dir.equals("Kungsbacka") || dir.equals("Alingsås") || dir.equals("Älvängen")|| dir.equals("Vänersborg")) {
-						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
-						Timer timerTemp = new Timer();
-						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
-						timers.add(timerTemp);
+						writer.println(arr.getJSONObject(j).toString());
+//						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
+//						Timer timerTemp = new Timer();
+//						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
+//						timers.add(timerTemp);
 					}
 				}
 				else {
 					if(arr.getJSONObject(j).getString("direction").equals("Göteborg")) {
-						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
-						Timer timerTemp = new Timer();
-						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
-						timers.add(timerTemp);
+						
+						writer.println(arr.getJSONObject(j).toString());
+//						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
+//						Timer timerTemp = new Timer();
+//						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
+//						timers.add(timerTemp);
 					}
 				}
 			}
+			writer.close();
 		}
 		
 		
@@ -316,13 +319,14 @@ public class Main {
 			return beforeMidnight + afterMidnight;
 		}
 	}
-	
+		
 	public static Date getDate(PublicTransportation pt) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(0);
 		cal.set(Integer.parseInt(pt.getDate().substring(0, 4)), Integer.parseInt(pt.getDate().substring(5,7))-1,
 				Integer.parseInt(pt.getDate().substring(8,10)), Integer.parseInt(pt.getStartTime().substring(0,2))
 				, Integer.parseInt(pt.getStartTime().substring(3,5)), 00);
+		System.out.println(pt.getStartTime());
 		return cal.getTime(); 
 	}
 	
