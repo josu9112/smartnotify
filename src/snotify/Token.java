@@ -59,8 +59,8 @@ public class Token {
 		try {
 			response = new AuthorizationCodeTokenRequest(new NetHttpTransport(), new JacksonFactory(),
 					new GenericUrl("https://api.vasttrafik.se/token"), "POST")
-							.set("redirect_uri", "https://api.vasttrafik.se/token").set("client_id", client_id)
-							.set("client_secret", client_secret).set("grant_type", "client_credentials")
+							.set("redirect_uri", "https://api.vasttrafik.se/token").set("client_id", this.client_id)
+							.set("client_secret", this.client_secret).set("grant_type", "client_credentials")
 							.set("Content-type", "application/x-www-form-urlencoded").execute();
 		} catch (IOException e) {
 			e.printStackTrace();

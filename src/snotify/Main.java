@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GlobalPosition;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import java.util.ArrayList;
@@ -141,38 +142,47 @@ public class Main {
 		for(int i = 0; i < stops.size(); i++) {
 			DepartureBoard dep = new DepartureBoard(token);
 			dep.setStartId(stops.get(i));
-			dep.setTime(new LocalTime().getHourOfDay() + ":" + (new LocalTime().getMinuteOfHour()+2));
+			LocalTime time = new LocalTime();
+			dep.setTime(time.getHourOfDay() + ":" + (time.getMinuteOfHour()+3));
 			dep.setUseLongDistanceTrain(false);
 			dep.setUseRegionalTrain(false);
 			dep.setUseBus(false);
-			dep.setDate("2018-03-17");
+			dep.setDate("2018-03-19");
 			dep.setTimeSpan(270);
 			JSONObject obj = dep.executeRequest();
 			JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
-			PrintWriter writer = new PrintWriter(new File(stops.get(i)+".txt"));
+//			PrintWriter writer = new PrintWriter(new File(stops.get(i)+".txt"));
 			for(int j = 0; j < arr.length(); j++) {
 				if(i == 0) {
 					String dir = arr.getJSONObject(j).getString("direction");
 					if(dir.equals("Kungsbacka") || dir.equals("Alingsås") || dir.equals("Älvängen")|| dir.equals("Vänersborg")) {
-						writer.println(arr.getJSONObject(j).toString());
-//						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
-//						Timer timerTemp = new Timer();
-//						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
-//						timers.add(timerTemp);
+//						writer.println(arr.getJSONObject(j).toString());
+						JourneyDetail jd = new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
+						String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
+						if(compareTime(startDepTime, time.getHourOfDay()+":"+time.getMinuteOfHour())) {
+							PublicTransportation temp = new PublicTransportation(jd);
+							Timer timerTemp = new Timer();
+							timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60*1000);
+							timers.add(timerTemp);
+						}
 					}
 				}
 				else {
 					if(arr.getJSONObject(j).getString("direction").equals("Göteborg")) {
 						
-						writer.println(arr.getJSONObject(j).toString());
-//						PublicTransportation temp = new PublicTransportation(new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString()));
-//						Timer timerTemp = new Timer();
-//						timerTemp.schedule(new CheckJourney(temp), getDate(temp), 30*1000);
-//						timers.add(timerTemp);
+//						writer.println(arr.getJSONObject(j).toString());
+						JourneyDetail jd = new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
+						String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
+						if(compareTime(startDepTime, time.getHourOfDay()+":"+time.getMinuteOfHour())) {
+							PublicTransportation temp = new PublicTransportation(jd);
+							Timer timerTemp = new Timer();
+							timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60*1000);
+							timers.add(timerTemp);
+						}
 					}
 				}
 			}
-			writer.close();
+//			writer.close();
 		}
 		
 		
@@ -326,9 +336,24 @@ public class Main {
 		cal.set(Integer.parseInt(pt.getDate().substring(0, 4)), Integer.parseInt(pt.getDate().substring(5,7))-1,
 				Integer.parseInt(pt.getDate().substring(8,10)), Integer.parseInt(pt.getStartTime().substring(0,2))
 				, Integer.parseInt(pt.getStartTime().substring(3,5)), 00);
-		System.out.println(pt.getStartTime());
 		return cal.getTime(); 
 	}
 	
-
+	public static boolean compareTime(String depTime, String otherTime) {
+		int depTimeHour = Integer.parseInt(depTime.substring(0, 2));
+		int depTimeMinute = Integer.parseInt(depTime.substring(3, 5));
+		int otherTimeHour = Integer.parseInt(otherTime.substring(0, 2));
+		int otherTimeMinute;
+		if(otherTime.length() == 5)
+			otherTimeMinute = Integer.parseInt(otherTime.substring(3, 5));
+		else
+			otherTimeMinute = Integer.parseInt(otherTime.substring(3, 4));
+			
+		if(otherTimeHour < depTimeHour)
+			return true;
+		else if(otherTimeHour == depTimeHour && otherTimeMinute < depTimeMinute)
+			return true;
+		else
+			return false;
+	}
 }
