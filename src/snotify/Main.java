@@ -147,11 +147,15 @@ public class Main {
 			dep.setUseLongDistanceTrain(false);
 			dep.setUseRegionalTrain(false);
 			dep.setUseBus(false);
-			dep.setDate("2018-03-19");
-			dep.setTimeSpan(270);
+			dep.setDate("2018-03-20");
+			dep.setTimeSpan(540);
 			JSONObject obj = dep.executeRequest();
+			JSONArray arr = null;
 			try {
-				JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+				arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+			}catch(Exception e) {
+				System.out.println("Inga åkturer");
+			}
 				for(int j = 0; j < arr.length(); j++) {
 					if(i == 0) {
 						String dir = arr.getJSONObject(j).getString("direction");
@@ -180,11 +184,7 @@ public class Main {
 						}
 					}
 				}
-			}catch(Exception e) {
-				System.out.println("Inga åkturer");
 			}
-		}
-		System.out.println(token.getExpiresIn());
 		
 //		Timer timer = new Timer();
 //		TimerTask task = new TimerTask() {
@@ -355,12 +355,9 @@ public class Main {
 	public static boolean compareTime(String depTime, String otherTime) {
 		int depTimeHour = Integer.parseInt(depTime.substring(0, 2));
 		int depTimeMinute = Integer.parseInt(depTime.substring(3, 5));
-		int otherTimeHour = Integer.parseInt(otherTime.substring(0, 2));
-		int otherTimeMinute;
-		if(otherTime.length() == 5)
-			otherTimeMinute = Integer.parseInt(otherTime.substring(3, 5));
-		else
-			otherTimeMinute = Integer.parseInt(otherTime.substring(3, 4));
+		int otherTimeHour = Integer.parseInt(otherTime.substring(0, otherTime.indexOf(":")));
+		int otherTimeMinute = Integer.parseInt(otherTime.substring(otherTime.indexOf(":")+1, otherTime.length()));
+			
 			
 		if(otherTimeHour < depTimeHour)
 			return true;
