@@ -39,7 +39,6 @@ public class Token {
 							.set("Content-type", "application/x-www-form-urlencoded").execute();
 		} catch (IOException e) {
 			e.printStackTrace();
-			
 		}
 	}
 
@@ -48,7 +47,19 @@ public class Token {
 	 * @return Returns the access-token
 	 */
 	public String getAccessToken() {
-		return response.getAccessToken();
+		return this.response.getAccessToken();
+	}
+	
+	public long getExpiresIn() {
+		return this.response.getExpiresInSeconds();
+	}
+	
+	public String getClientId() {
+		return this.client_id;
+	}
+	
+	public String getClienSecret() {
+		return this.client_secret;
 	}
 	
 	

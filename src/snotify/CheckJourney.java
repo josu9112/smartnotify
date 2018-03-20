@@ -36,6 +36,7 @@ public class CheckJourney extends TimerTask {
 			System.out.println(pt.getDirection() + ", Stop: "+ whatStop + " , Delay: " + delay);
 			pt.setDelay(delay);
 		} catch (IOException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 	

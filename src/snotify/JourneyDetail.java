@@ -52,13 +52,15 @@ public class JourneyDetail {
 		req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
 		req.setConnectTimeout(30000);
 		req.setReadTimeout(30000);
-		HttpResponse resp = req.execute();
-
-		while(resp.getStatusCode()!=200) {
-			token.renewToken();
+		HttpResponse resp;
+		try{
+			resp = req.execute();
+		}catch(Exception e) {
+			this.token.renewToken();
 			req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
 			resp = req.execute();
 		}
+		
 		
 		return new JSONObject(resp.parseAsString());
 	}

@@ -38,7 +38,7 @@ public class Main {
 		secret = secret.substring(secret.indexOf(" ")+1);
 		scan.close();
 		Token token = new Token(id, secret);
-
+		
 		
 		/* Kod för att få ut alla linjer från en station, alla veckodagar*/
 //		for(int i = 5; i <= 11; i++) {
@@ -150,40 +150,53 @@ public class Main {
 			dep.setDate("2018-03-19");
 			dep.setTimeSpan(270);
 			JSONObject obj = dep.executeRequest();
-			JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
-//			PrintWriter writer = new PrintWriter(new File(stops.get(i)+".txt"));
-			for(int j = 0; j < arr.length(); j++) {
-				if(i == 0) {
-					String dir = arr.getJSONObject(j).getString("direction");
-					if(dir.equals("Kungsbacka") || dir.equals("Alingsås") || dir.equals("Älvängen")|| dir.equals("Vänersborg")) {
-//						writer.println(arr.getJSONObject(j).toString());
-						JourneyDetail jd = new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
-						String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
-						if(compareTime(startDepTime, time.getHourOfDay()+":"+time.getMinuteOfHour())) {
-							PublicTransportation temp = new PublicTransportation(jd);
-							Timer timerTemp = new Timer();
-							timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60*1000);
-							timers.add(timerTemp);
+			try {
+				JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+				for(int j = 0; j < arr.length(); j++) {
+					if(i == 0) {
+						String dir = arr.getJSONObject(j).getString("direction");
+						if(dir.equals("Kungsbacka") || dir.equals("Alingsås") || dir.equals("Älvängen")|| dir.equals("Vänersborg")) {
+							JourneyDetail jd = new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
+							String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
+							if(compareTime(startDepTime, time.getHourOfDay()+":"+time.getMinuteOfHour())) {
+								PublicTransportation temp = new PublicTransportation(jd);
+								Timer timerTemp = new Timer();
+								timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60*1000);
+								timers.add(timerTemp);
+							}
+						}
+					}
+					else {
+						if(arr.getJSONObject(j).getString("direction").equals("Göteborg")) {
+							
+							JourneyDetail jd = new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
+							String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
+							if(compareTime(startDepTime, time.getHourOfDay()+":"+time.getMinuteOfHour())) {
+								PublicTransportation temp = new PublicTransportation(jd);
+								Timer timerTemp = new Timer();
+								timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60*1000);
+								timers.add(timerTemp);
+							}
 						}
 					}
 				}
-				else {
-					if(arr.getJSONObject(j).getString("direction").equals("Göteborg")) {
-						
-//						writer.println(arr.getJSONObject(j).toString());
-						JourneyDetail jd = new JourneyDetail(token,arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
-						String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
-						if(compareTime(startDepTime, time.getHourOfDay()+":"+time.getMinuteOfHour())) {
-							PublicTransportation temp = new PublicTransportation(jd);
-							Timer timerTemp = new Timer();
-							timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60*1000);
-							timers.add(timerTemp);
-						}
-					}
-				}
+			}catch(Exception e) {
+				System.out.println("Inga åkturer");
 			}
-//			writer.close();
 		}
+		System.out.println(token.getExpiresIn());
+		
+//		Timer timer = new Timer();
+//		TimerTask task = new TimerTask() {
+//
+//			@Override
+//			public void run() {
+//				token.renewToken();
+//				System.out.println(token.getAccessToken());
+//			}
+//			
+//		};
+//		timer.schedule(task, 500*1000);
 		
 		
 		
