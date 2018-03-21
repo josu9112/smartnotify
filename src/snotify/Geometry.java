@@ -39,11 +39,23 @@ public class Geometry {
 			}
 		});
 		
-		HttpRequest req = requestFact.buildGetRequest(new GenericUrl(this.refLink));
+		HttpRequest req = null;
+		try {
+			req = requestFact.buildGetRequest(new GenericUrl(this.refLink));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
 		req.setConnectTimeout(30000);
 		req.setReadTimeout(30000);
-		HttpResponse resp = req.execute();
+		HttpResponse resp;
+		try{
+			resp = req.execute();
+		}catch(Exception e) {
+			this.token.renewToken();
+			req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
+			resp = req.execute();
+		}
 		
 		return new JSONObject(resp.parseAsString());
 	}

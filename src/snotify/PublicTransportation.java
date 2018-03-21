@@ -27,7 +27,7 @@ public class PublicTransportation {
 	private String linje;
 	private String journeyDetailRef;
 	private String direction;
-	private ArrayList<String> stops;
+	private ArrayList<Stop> stops;
 	private ArrayList<Integer> delays;
 	private boolean travels;
 	private int currentStop;
@@ -69,7 +69,7 @@ public class PublicTransportation {
 		this.linje = linje;
 		this.journeyid = journeyid;
 		this.journeyDetailRef = journeyDetailRef;
-		stops = new ArrayList<String>();
+		stops = new ArrayList<Stop>();
 		this.direction = direction;
 		this.currentStop = 0;
 		delays = new ArrayList<Integer>();
@@ -80,7 +80,7 @@ public class PublicTransportation {
 		this.totalTime = totalTime;
 	}
 	
-	public PublicTransportation(JourneyDetail journeyDetail) throws JSONException, IOException {
+	public PublicTransportation(JourneyDetail journeyDetail) throws JSONException, IOException  {
 		this.journeyDetail = journeyDetail;
 		
 		JSONObject ob = journeyDetail.executeRequest();
@@ -92,7 +92,7 @@ public class PublicTransportation {
 		this.linje = ob.getJSONObject("JourneyDetail").getJSONObject("JourneyName").getString("name");
 		this.direction = ob.getJSONObject("JourneyDetail").getJSONObject("Direction").getString("$");
 		this.journeyid = ob.getJSONObject("JourneyDetail").getJSONObject("JourneyId").getString("id");
-		this.stops = new ArrayList<String>();
+		this.stops = new ArrayList<Stop>();
 		this.setStops(ob.getJSONObject("JourneyDetail").getJSONArray("Stop"));
 		this.date = ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depDate");
 		this.distance = calcDistance(gem.executeRequest().getJSONObject("Geometry").getJSONObject("Points").getJSONArray("Point"));
@@ -101,25 +101,13 @@ public class PublicTransportation {
 		this.delays = new ArrayList<Integer>();
 		this.totalTime = calcJourneyTime(ob.getJSONObject("JourneyDetail").getJSONArray("Stop"));
 		days = new ArrayList<String>();
-		days.add(weekday);
+		days.add(ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depDate"));
 	}
 		
 	
 	public boolean compareTo(PublicTransportation pt) {
 		return (this.journeyid.equals(pt.journeyid)) ? true : false;
 	}
-	
-	
-//	public void setWeekdayDay(String date) {
-//		String weekday = determineWeekday(date);
-//		
-//		for(String a : this.days) {
-//			if(a.equals(weekday))
-//				return;
-//		}
-//		this.days.add(weekday);
-//	}
-	
 	
 	public void setWeekdayDay(String date) {
 		String weekday = determineWeekday(date);
@@ -155,6 +143,14 @@ public class PublicTransportation {
 		return direction;
 	}
 	
+	public String getStartStopName() {
+		return this.stops.get(0).getStopName();
+	}
+	
+	public String getEndStopName() {
+		return this.stops.get(this.stops.size()-1).getStopName();
+	}
+	
 	public void setCurrentStop(int stopnr) {
 		this.currentStop = stopnr;
 	}
@@ -165,11 +161,11 @@ public class PublicTransportation {
 	
 	public void setStops(JSONArray stops) {
 		for(int i = 0; i < stops.length(); i++) {
-			this.stops.add(stops.getJSONObject(i).getString("name"));
+			this.stops.add(new Stop(stops.getJSONObject(i).getString("id"),stops.getJSONObject(i).getString("name")));
 		}
 	}
 	
-	public ArrayList<String> getStops(){
+	public ArrayList<Stop> getStops(){
 		return stops;
 	}
 	
