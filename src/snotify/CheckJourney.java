@@ -21,6 +21,12 @@ public class CheckJourney extends TimerTask {
 		JSONObject obj = null;
 		try {
 			obj = pt.getJourneyDetail().executeRequest();
+			if(obj.getJSONObject("JourneyDetail").has("error")) {
+				System.out.println(obj.getJSONObject("JourneyDetail").getString("error"));
+			}
+			if(obj.getJSONObject("JourneyDetail").has("errortext")) {
+				System.out.println(obj.getJSONObject("JourneyDetail").getString("errortext"));
+			}
 			JSONArray arr = obj.getJSONObject("JourneyDetail").getJSONArray("Stop");
 			int whatStop = pt.getCurrentStop();
 			while(!arr.getJSONObject(whatStop).has("rtDepTime") && !arr.getJSONObject(whatStop).has("rtArrTime")) {

@@ -40,47 +40,66 @@ public class Main {
 
 //		pt = new ArrayList<PublicTransportation>();
 		
-		Timer cj = new Timer();
-		cj.schedule(new CollectJourneys(token), 1440*1000);
+//		Timer cj = new Timer();
+//		cj.schedule(new CollectJourneys(token), 1440*1000);
 
-
+//		DepartureBoard kba = new DepartureBoard(token);
+//		kba.setStartId("9021014019110000");
+//		kba.setTime("09:00");
+//		kba.setUseLongDistanceTrain(false);
+//		kba.setUseRegionalTrain(false);
+//		kba.setUseBus(false);
+//		departure.setTimeSpan(1440);
+//		kba.setDate("2018-03-22");
+//		JSONObject obj = kba.executeRequest();
+//		JSONArray arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+//		
+//		for(int i = 0; i < arr.length(); i++)
+//			System.out.println(arr.getJSONObject(i).toString());
+		
+		
+		
+//		JourneyDetail detail = new JourneyDetail(token,"https://api.vasttrafik.se/bin/rest.exe/v2/journeyDetail?ref=299994%2F118802%2F969204%2F384604%2F80%3Fdate%3D2018-03-22%26station_evaId%3D19110001%26station_type%3Ddep%26format%3Djson%26");
+//		JSONObject temp = detail.executeRequest();
+//		System.out.println(temp.toString());
+		
 		/* Kod för att få ut alla linjer från en station, alla veckodagar */
 
 		
-//		ArrayList<DepartureBoard> departures = new ArrayList<DepartureBoard>();
-//		DepartureBoard gbg1 = new DepartureBoard(token);
-//		gbg1.setStartId("9021014008000000");
-//		gbg1.setStopId("9021014019110000");
-//		DepartureBoard gbg2 = new DepartureBoard(token);
-//		gbg2.setStartId("9021014008000000");
-//		gbg2.setStopId("9021014016611000");
-//		DepartureBoard gbg3 = new DepartureBoard(token);
-//		gbg3.setStartId("9021014008000000");
-//		gbg3.setStopId("9021014017510000");
-//		DepartureBoard gbg4 = new DepartureBoard(token);
-//		gbg4.setStartId("9021014008000000");
-//		gbg4.setStopId("9021014080802000");
-//		DepartureBoard kba = new DepartureBoard(token);
-//		kba.setStartId("9021014019110000");
-//		kba.setStopId("9021014008000000");
-//		DepartureBoard alvangen = new DepartureBoard(token);
-//		alvangen.setStartId("9021014016611000");
-//		alvangen.setStopId("9021014008000000");
-//		DepartureBoard alingsas = new DepartureBoard(token);
-//		alingsas.setStartId("9021014017510000");
-//		alingsas.setStopId("9021014008000000");
-//		DepartureBoard vanersborg = new DepartureBoard(token);
-//		vanersborg.setStartId("9021014080802000");
-//		vanersborg.setStopId("9021014008000000");
-//		
-//		departures.add(gbg1);
-//		departures.add(gbg2);
-//		departures.add(gbg3);
-//		departures.add(gbg4);
-//		departures.add(kba);
-//		departures.add(alvangen);
-//		departures.add(alingsas);
-//		departures.add(vanersborg);
+		ArrayList<DepartureBoard> departures = new ArrayList<DepartureBoard>();
+		DepartureBoard gbg1 = new DepartureBoard(token);
+		gbg1.setStartId("9021014008000000");
+		gbg1.setStopId("9021014019110000");
+		DepartureBoard gbg2 = new DepartureBoard(token);
+		gbg2.setStartId("9021014008000000");
+		gbg2.setStopId("9021014016611000");
+		DepartureBoard gbg3 = new DepartureBoard(token);
+		gbg3.setStartId("9021014008000000");
+		gbg3.setStopId("9021014017510000");
+		DepartureBoard gbg4 = new DepartureBoard(token);
+		gbg4.setStartId("9021014008000000");
+		gbg4.setStopId("9021014080802000");
+		DepartureBoard kba = new DepartureBoard(token);
+		kba.setStartId("9021014019110000");
+		kba.setStopId("9021014008000000");
+		DepartureBoard alvangen = new DepartureBoard(token);
+		alvangen.setStartId("9021014016611000");
+		alvangen.setStopId("9021014008000000");
+		DepartureBoard alingsas = new DepartureBoard(token);
+		alingsas.setStartId("9021014017510000");
+		alingsas.setStopId("9021014008000000");
+		DepartureBoard vanersborg = new DepartureBoard(token);
+		vanersborg.setStartId("9021014080802000");
+		vanersborg.setStopId("9021014008000000");
+		
+		departures.add(gbg1);
+		departures.add(gbg2);
+		departures.add(gbg3);
+		departures.add(gbg4);
+		departures.add(kba);
+		departures.add(alvangen);
+		departures.add(alingsas);
+		departures.add(vanersborg);
 		
 		
 //		ArrayList<String> stopids = new ArrayList<String>();
@@ -218,40 +237,40 @@ public class Main {
 //		stops.add("9021014017510000"); // Alingsås
 //		stops.add("9021014080802000"); // Vänersborg
 
-//		ArrayList<Timer> timers = new ArrayList<Timer>();
-//
-//		for (int i = 0; i < stops.size(); i++) {
-//			DepartureBoard dep = new DepartureBoard(token);
+		ArrayList<Timer> timers = new ArrayList<Timer>();
+
+		for (int i = 0; i < departures.size(); i++) {
+			DepartureBoard dep = departures.get(i);
 //			dep.setStartId(stops.get(i));
-//			LocalTime time = new LocalTime();
-//			dep.setTime(time.getHourOfDay() + ":" + (time.getMinuteOfHour() + 3));
-//			dep.setUseLongDistanceTrain(false);
-//			dep.setUseRegionalTrain(false);
-//			dep.setUseBus(false);
-//			dep.setDate("2018-03-20");
-//			dep.setTimeSpan(540);
-//			JSONObject obj = dep.executeRequest();
-//			JSONArray arr = null;
-//			try {
-//				arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
-//			} catch (Exception e) {
-//				System.out.println("Inga åkturer");
-//			}
-//			for (int j = 0; j < arr.length(); j++) {
+			LocalTime time = new LocalTime();
+			dep.setTime(time.getHourOfDay() + ":" + (time.getMinuteOfHour() + 5));
+			dep.setUseLongDistanceTrain(false);
+			dep.setUseRegionalTrain(false);
+			dep.setUseBus(false);
+			dep.setDate("2018-03-22");
+			dep.setTimeSpan(780);
+			JSONObject obj = dep.executeRequest();
+			JSONArray arr = null;
+			try {
+				arr = obj.getJSONObject("DepartureBoard").getJSONArray("Departure");
+			} catch (Exception e) {
+				System.out.println("Inga åkturer");
+			}
+			for (int j = 0; j < arr.length(); j++) {
 //				if (i == 0) {
 //					String dir = arr.getJSONObject(j).getString("direction");
 //					if (dir.equals("Kungsbacka") || dir.equals("Alingsås") || dir.equals("Älvängen")
 //							|| dir.equals("Vänersborg")) {
-//						JourneyDetail jd = new JourneyDetail(token,
-//								arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
-//						String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop")
-//								.getJSONObject(0).getString("depTime");
-//						if (compareTime(startDepTime, time.getHourOfDay() + ":" + time.getMinuteOfHour())) {
-//							PublicTransportation temp = new PublicTransportation(jd);
-//							Timer timerTemp = new Timer();
-//							timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60 * 1000);
-//							timers.add(timerTemp);
-//						}
+						JourneyDetail jd = new JourneyDetail(token,
+								arr.getJSONObject(j).getJSONObject("JourneyDetailRef").get("ref").toString());
+						String startDepTime = jd.executeRequest().getJSONObject("JourneyDetail").getJSONArray("Stop")
+								.getJSONObject(0).getString("depTime");
+						if (compareTime(startDepTime, time.getHourOfDay() + ":" + time.getMinuteOfHour())) {
+							PublicTransportation temp = new PublicTransportation(jd);
+							Timer timerTemp = new Timer();
+							timerTemp.schedule(new CheckJourney(temp), getDate(temp), 60 * 1000);
+							timers.add(timerTemp);
+						}
 //					}
 //				} else {
 //					if (arr.getJSONObject(j).getString("direction").equals("Göteborg")) {
@@ -268,8 +287,8 @@ public class Main {
 //						}
 //					}
 //				}
-//			}
-//		}
+			}
+		}
 
 		/* Sålla stationer */
 		// Scanner scan = new Scanner(new
