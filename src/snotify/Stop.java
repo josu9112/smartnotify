@@ -2,16 +2,25 @@ package snotify;
 
 public class Stop {
 
-	private String stopId;
+	private String time;
 	private String stopName;
+	private int delay;
 	
-	public Stop(String stopId, String stopName) {
-		this.stopId = stopId;
+	public Stop(String time, String stopName) {
+		this.time = time;
 		this.stopName = stopName;
 	}
 
-	public String getStopId() {
-		return stopId;
+	public void setDelay(int delay) {
+		this.delay = delay;
+	}
+	
+	public int getDelay() {
+		return this.delay;
+	}
+	
+	public String getTime() {
+		return this.time;
 	}
 
 	public String getStopName() {

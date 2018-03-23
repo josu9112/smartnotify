@@ -39,47 +39,6 @@ public class PublicTransportation {
 	private JourneyDetail journeyDetail;
 	private ArrayList<String> days;
 
-	
-	public PublicTransportation(String type, String linje, String journeyid, String journeyDetailRef) {
-		this.type = type;
-		this.linje = linje;
-		this.journeyid = journeyid;
-		this.journeyDetailRef = journeyDetailRef;
-	}
-	
-	/**
-	 * @param type bus/tram/train
-	 * @param linje number
-	 * @param journeyid
-	 * @param journeyDetailRef
-	 * @param direction lastStop
-	 * @param startTime starttime of trip
-	 * @param distance total distance of trip in meters
-	 * @param date date of trip
-	 * @param totalTime totaltime of trip in minutes
-	 */
-	public PublicTransportation(String type, String linje, String journeyid, 
-			String journeyDetailRef, String direction, String startTime, double distance, String date, int totalTime) {
-		days = new ArrayList<String>();
-		
-	}
-	
-	public PublicTransportation(String type, String linje, String journeyid, String journeyDetailRef, String weekday) {
-		this.type = type;
-		this.linje = linje;
-		this.journeyid = journeyid;
-		this.journeyDetailRef = journeyDetailRef;
-		stops = new ArrayList<Stop>();
-		this.direction = direction;
-		this.currentStop = 0;
-		delays = new ArrayList<Integer>();
-		this.startTime = startTime;
-		this.distance = distance;
-		this.date = date;
-		this.weekday = determineWeekday(date);
-		this.totalTime = totalTime;
-	}
-	
 	public PublicTransportation(JourneyDetail journeyDetail) throws JSONException, IOException  {
 		this.journeyDetail = journeyDetail;
 		
@@ -102,6 +61,7 @@ public class PublicTransportation {
 		this.totalTime = calcJourneyTime(ob.getJSONObject("JourneyDetail").getJSONArray("Stop"));
 		days = new ArrayList<String>();
 		days.add(ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depDate"));
+		this.weekday = determineWeekday(this.date);
 	}
 		
 	
@@ -161,7 +121,10 @@ public class PublicTransportation {
 	
 	public void setStops(JSONArray stops) {
 		for(int i = 0; i < stops.length(); i++) {
-			this.stops.add(new Stop(stops.getJSONObject(i).getString("id"),stops.getJSONObject(i).getString("name")));
+			if(i < stops.length()-1)
+				this.stops.add(new Stop(stops.getJSONObject(i).getString("depTime"), stops.getJSONObject(i).getString("name")));
+			else
+				this.stops.add(new Stop(stops.getJSONObject(i).getString("arrTime"), stops.getJSONObject(i).getString("name")));
 		}
 	}
 	
@@ -216,8 +179,8 @@ public class PublicTransportation {
 	
 	public void printJourney() {
 		try {
-			PrintWriter writer = new PrintWriter(new File("C:\\Users\\John\\Desktop\\resor\\" + this.journeyid + ".txt"));
-			writer.println("Station\t" + "Försening");
+			PrintWriter writer = new PrintWriter(new File("C:\\Users\\John\\Desktop\\resor\\" + this.journeyid + System.currentTimeMillis() +  ".txt"));
+			writer.println("Station\t" + "Försening\t" + this.journeyid);
 			for(int i = 0; i < stops.size(); i++)
 				writer.println(stops.get(i).toString() + "\t" + delays.get(i).toString());
 			writer.close();
@@ -225,6 +188,17 @@ public class PublicTransportation {
 		}
 	}
 	
+	public int getDelayed() {
+		if(delays.get(delays.size()-1) > 0)
+			return 1;
+		else {
+			for(Integer a : delays) {
+				if(a>0)
+					return -1;
+			}
+			return 0;
+		}
+	}
 	
 	private static String determineWeekday(String date){
 		SimpleDateFormat format1=new SimpleDateFormat("yyyy-MM-dd");

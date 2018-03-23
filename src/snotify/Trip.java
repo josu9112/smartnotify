@@ -1,5 +1,18 @@
 package snotify;
 
+import java.io.IOException;
+
+import org.json.JSONObject;
+
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+
 /**
  * @author John Sundemo & Rustam Stanikzai
  *	Class Trip is used to receive information about a trip from a destination to another
@@ -62,11 +75,11 @@ public class Trip {
 	private int maxCarDist;
 	private int onlyCar;
 	private int maxChanges;
-	private int addiotionalChangeTime;
+	private int additionalChangeTime;
 	private int disregardDefaultChangeMargin;
 	private int needJourneyDetail;
 	private int needGeo;
-	private int needltinerary;
+	private int needItinerary;
 	private int numTrips;
 	
 	
@@ -112,26 +125,26 @@ public class Trip {
 		this.usePublicTransportation = 1;
 		this.excludeDR = 0;
 		this.maxWalkDist = 0;
-		this.walkSpeed = 0.5;
+		this.walkSpeed = 0;
 		this.originWalk = 1;
 		this.destWalk = 1;
 		this.onlyWalk = 0;
 		this.originBike = 0;
 		this.maxBikeDist = 0;
-		this.bikeCriterion = null;
-		this.bikeProfile = null;
-		this.onlyBike = 1;
+		this.bikeCriterion = "";
+		this.bikeProfile = "";
+		this.onlyBike = 0;
 		this.originCar = 0;
 		this.originCarWithParking = 0;
 		this.maxCarDist = 0;
 		this.onlyCar = 0;
-		this.maxChanges = 0;
-		this.addiotionalChangeTime = 0;
+		this.maxChanges = -1;
+		this.additionalChangeTime = 0;
 		this.disregardDefaultChangeMargin = 0;
-		this.needJourneyDetail = 0;
-		this.needGeo = 0;
-		this.needltinerary = 0;
-		this.numTrips = 10;
+		this.needJourneyDetail = 1;
+		this.needGeo = 1;
+		this.needItinerary = 0;
+		this.numTrips = 0;
 	}
 
 
@@ -521,8 +534,8 @@ public class Trip {
 	 * To prolong the minimal change times in minutes between the public transport legs of the returned journeys
 	 * @param addiotionalChangeTime Additional change time in minutes.
 	 */
-	public void setAddiotionalChangeTime(int addiotionalChangeTime) {
-		this.addiotionalChangeTime = addiotionalChangeTime;
+	public void setAdditionalChangeTime(int additionalChangeTime) {
+		this.additionalChangeTime = additionalChangeTime;
 	}
 
 
@@ -557,8 +570,8 @@ public class Trip {
 	 * If a reference link for each leg of the resulting trips, which can be used to request the itinerary, is needed, set this to true
 	 * @param needltinerary Need itinerary == true. Not needed == false.
 	 */
-	public void setNeedltinerary(boolean needltinerary) {
-		this.needltinerary = (needltinerary) ? 1 : 0;
+	public void setNeedItinerary(boolean needItinerary) {
+		this.needItinerary = (needItinerary) ? 1 : 0;
 	}
 
 
@@ -571,6 +584,146 @@ public class Trip {
 	}
 	
 	
+	/**
+	 * This method makes a get request to the class Trip from Vasttrafik
+	 * @return JSONObject of Trip from Vasttrafik
+	 * @throws IOException
+	 */
+	public JSONObject executeRequest() throws IOException {
+		String requestLink = buildRequestLink();
+		if(requestLink == null)
+			return null;
+		
+		HttpTransport trans = new NetHttpTransport();
+		
+		HttpRequestFactory requestFact = trans.createRequestFactory(new HttpRequestInitializer() {
+			@Override
+			public void initialize(HttpRequest request) {
+				request.getHeaders().setAuthorization("Bearer " + token.getAccessToken());
+			}
+		});
+		
+		HttpRequest req = requestFact.buildGetRequest(new GenericUrl(requestLink));
+		req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
+		req.setConnectTimeout(30000);
+		req.setReadTimeout(300000);
+		HttpResponse resp = req.execute();
+		
+		while(resp.getStatusCode()==401) {
+			token.renewToken();
+			req.setHeaders(new HttpHeaders().setAuthorization("Bearer " + this.token.getAccessToken()));
+			resp = req.execute();
+		}
+			
+
+		return new JSONObject(resp.parseAsString());
+	}
+	
+	
+	
+	/**
+	 * This private function builds a url-string of set parameters to send as request.
+	 * @return A String with the link of set parameters.
+	 */
+	private String buildRequestLink() {
+		String requestLink = this.baseRequestAddress;
+		if(this.originId != null && this.destId !=null)
+			requestLink += "?originId=" + this.originId + "&destId=" + this.destId;
+		else if(this.originCoordLat != null && this.originCoordLong != null 
+				&& this.destCoordLat != null && this.destCoordLong != null)
+			requestLink += "?originCoordLat=" + this.originCoordLat + 
+			"&originCoordLong=" + this.originCoordLong + "&destCoordLat=" + this.destCoordLat + 
+			"&destCoordLong=" + this.destCoordLong;
+		else if(this.originCoordName != null && this.destCoordName != null)
+			requestLink += "?originCoordName=" + this.originCoordName + "&destCoordName=" + this.destCoordName;
+			
+		if(requestLink.equals(this.baseRequestAddress) || (this.date == null || this.time == null))
+			return null;
+		
+		requestLink += "&date=" + this.date + "&time=" + this.time;
+		
+		if(this.viaId != null)
+			requestLink = requestLink + "&viaId=" + this.viaId;
+		if(this.useVasttag == 0)
+			requestLink = requestLink + "&useVas=0";
+		if(this.useLongDistanceTrain == 0)
+			requestLink = requestLink + "&useLDTrain=0";
+		if(this.useRegionalTrain == 0)
+			requestLink = requestLink + "&useRegTrain=0";
+		if(this.useBus == 0)
+			requestLink = requestLink + "&useBus=0";
+		if(this.useBoat == 0)
+			requestLink = requestLink + "&useBoat=0";
+		if(this.useTram == 0)
+			requestLink = requestLink + "&useTram=0";
+		if(this.excludeDR == 0)
+			requestLink = requestLink + "&excludeDR=0";
+		if(this.needJourneyDetail == 0)
+			requestLink = requestLink + "&needJourneyDetail=0";
+		if(this.searchForArrival != 0)
+			requestLink = requestLink + "&searchForArrival=1";
+		if(this.useMedical != 0)
+			requestLink = requestLink + "&useMedical=1";
+		if(this.originMedicalConnection != 0)
+			requestLink = requestLink + "&originMedicalCon=1";
+		if(this.destMedicalConnection != 0)
+			requestLink = requestLink + "&destMedicalCon=1";
+		if(this.wheelChairSpace != 0)
+			requestLink = requestLink + "&wheelChairSpace=1";
+		if(this.strollerSpace != 0)
+			requestLink = requestLink + "&strollerSpace=1";
+		if(this.lowFloor != 0)
+			requestLink = requestLink + "&lowFloor=1";
+		if(this.rampOrLift != 0)
+			requestLink = requestLink + "&rampOrLift=1";
+		if(this.usePublicTransportation == 0)
+			requestLink = requestLink + "&usePT=0";
+		if(this.maxWalkDist != 0)
+			requestLink = requestLink + "&maxWalkDist=" + this.maxWalkDist;
+		if(this.walkSpeed != 0)
+			requestLink = requestLink + "&walkSpeed=" + this.walkSpeed;
+		if(this.originWalk == 0)
+			requestLink = requestLink + "&originWalk=0";
+		if(this.destWalk == 0)
+			requestLink = requestLink + "&destWalk=0";
+		if(this.onlyWalk != 0)
+			requestLink = requestLink + "&onlyWalk=1";
+		if(this.originBike != 0)
+			requestLink = requestLink + "&originBike=1";
+		if(this.maxBikeDist != 0)
+			requestLink = requestLink + "&maxBikeDist=" + this.maxBikeDist;
+		if(!this.bikeCriterion.equals(""))
+			requestLink = requestLink + "&bikeCriterion=" + this.bikeCriterion;
+		if(!this.bikeProfile.equals(""))
+			requestLink = requestLink + "&bikeProfile=" + this.bikeProfile;
+		if(this.onlyBike != 0)
+			requestLink = requestLink + "&onlyBike=1";
+		if(this.originCar != 0)
+			requestLink = requestLink + "&originCar=1";
+		if(this.originCarWithParking != 0)
+			requestLink = requestLink + "&originCarWithParking=1";
+		if(this.maxCarDist != 0)
+			requestLink = requestLink + "&maxCarDist=" + this.maxCarDist;
+		if(this.onlyCar != 0)
+			requestLink = requestLink + "&onlyCar=1";
+		if(this.maxChanges != -1)
+			requestLink = requestLink + "&maxChanges=" + this.maxChanges;
+		if(this.additionalChangeTime != 0)
+			requestLink = requestLink + "&additionalChangeTime=" + this.additionalChangeTime;
+		if(this.disregardDefaultChangeMargin != 0)
+			requestLink = requestLink + "&disregardDefaultChangeMargin=1";
+		if(this.maxChanges != 0)
+			requestLink = requestLink + "&maxChanges=" + this.maxChanges;
+		if(this.needGeo != 0)
+			requestLink = requestLink + "&needGeo=1";
+		if(this.needItinerary != 0)
+			requestLink = requestLink + "&needItinerary=1";
+		if(this.numTrips != 0)
+			requestLink = requestLink + "&numTrips=" + this.numTrips;
+		
+		
+		return requestLink + "&format=json";
+	}
 	
 	
 	

@@ -31,6 +31,10 @@ public class JourneyDetail {
 		this.refLink = refLink;
 	}
 	
+	public String getJourneyDetailRefLink() {
+		return this.refLink;
+	}
+	
 	public Token getToken() {
 		return token;
 	}
