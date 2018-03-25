@@ -38,6 +38,7 @@ public class PublicTransportation {
 	private int totalTime;
 	private JourneyDetail journeyDetail;
 	private ArrayList<String> days;
+	private boolean cancelled;
 
 	public PublicTransportation(JourneyDetail journeyDetail) throws JSONException, IOException  {
 		this.journeyDetail = journeyDetail;
@@ -62,6 +63,7 @@ public class PublicTransportation {
 		days = new ArrayList<String>();
 		days.add(ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depDate"));
 		this.weekday = determineWeekday(this.date);
+		this.cancelled = false;
 	}
 		
 	
@@ -150,11 +152,13 @@ public class PublicTransportation {
 	 
 	
 	public void setDelay(int delay) {
-		try {
-			delays.set(currentStop, delay);
-		}catch(Exception e) {
-			delays.add(delay);
-		}
+		this.stops.get(currentStop).setDelay(delay);
+		
+//		try {
+//			delays.set(currentStop, delay);
+//		}catch(Exception e) {
+//			delays.add(delay);
+//		}
 	}
 	
 	public ArrayList<Integer> getDelays(){
@@ -177,12 +181,22 @@ public class PublicTransportation {
 		return journeyDetail;
 	}
 	
+	public void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
+	
 	public void printJourney() {
 		try {
 			PrintWriter writer = new PrintWriter(new File("C:\\Users\\John\\Desktop\\resor\\" + this.journeyid + System.currentTimeMillis() +  ".txt"));
+			if(!cancelled) {
 			writer.println("Station\t" + "Försening\t" + this.journeyid);
 			for(int i = 0; i < stops.size(); i++)
-				writer.println(stops.get(i).toString() + "\t" + delays.get(i).toString());
+				writer.println(stops.get(i).getStopName() + "\t" + delays.get(i));
+			}
+			else {
+				writer.println(this.journeyid);
+				writer.println("Cancelled");
+			}
 			writer.close();
 		} catch (FileNotFoundException e) {
 		}

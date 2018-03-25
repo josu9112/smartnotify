@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import org.joda.time.LocalTime;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CheckJourney extends TimerTask {
@@ -27,7 +28,14 @@ public class CheckJourney extends TimerTask {
 			if(obj.getJSONObject("JourneyDetail").has("errortext")) {
 				System.out.println(obj.getJSONObject("JourneyDetail").getString("errortext"));
 			}
-			JSONArray arr = obj.getJSONObject("JourneyDetail").getJSONArray("Stop");
+			JSONArray arr;
+			try {
+				arr = obj.getJSONObject("JourneyDetail").getJSONArray("Stop");
+			}catch(Exception e) {
+				findNewLink();
+				obj = pt.getJourneyDetail().executeRequest();
+				arr = obj.getJSONObject("JourneyDetail").getJSONArray("Stop");
+			}
 			int whatStop = pt.getCurrentStop();
 			while(!arr.getJSONObject(whatStop).has("rtDepTime") && !arr.getJSONObject(whatStop).has("rtArrTime")) {
 				if(arr.getJSONObject(whatStop).getInt("routeIdx") == obj.getJSONObject("JourneyDetail").getJSONObject("JourneyType").getInt("routeIdxTo")) {
@@ -46,12 +54,52 @@ public class CheckJourney extends TimerTask {
 		}
 	}
 	
+	
+	private void findNewLink() {
+		Trip trip = new Trip(pt.getJourneyDetail().getToken());
+		trip.setDate(pt.getDate());
+		trip.setTime(pt.getStartTime());
+		trip.setUseBus(false);
+		trip.setUseLongDistanceTrain(false);
+		trip.setUseRegionalTrain(false);
+		trip.setUseTram(false);
+		trip.setMaxChanges(0);
+		JSONObject obj = null;
+		try {
+			obj = trip.executeRequest().getJSONObject("TripList");
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+		JSONArray arr = obj.getJSONArray("Trip");
+		for(int i = 0; i < arr.length(); i++) {
+			if(arr.getJSONObject(i).getJSONObject("Leg").getString("id").equals(pt.getJourneyid())) {
+				if(arr.getJSONObject(i).getJSONObject("Leg").has("cancelled") && 
+						arr.getJSONObject(i).getJSONObject("Leg").getBoolean("cancelled") == true) {
+					pt.printJourney();
+					this.cancel();
+					return;
+				}
+				JourneyDetail temp = new JourneyDetail(pt.getJourneyDetail().getToken(),arr.getJSONObject(i)
+						.getJSONObject("Leg").getJSONObject("JourneyDetailRef").getString("ref"));
+				try {
+					pt = new PublicTransportation(temp);
+				} catch (JSONException | IOException e) {
+					System.out.println("Tried new link, doesn't work");
+					System.out.println(e.getMessage());
+					this.cancel();
+					return;
+				}
+				break;
+			}
+		}
+	}
+	
 	private int calcTimeDifference(JSONObject journeystop) {
 		String time1;
 		String time2;
 		String date1;
 		String date2;
-		if(journeystop.getInt("routeIdx") != pt.getStops().size()-1) {
+		if(pt.getCurrentStop() != pt.getStops().size()-1) {
 			time1 = journeystop.getString("depTime");
 			time2 = journeystop.getString("rtDepTime");
 			date1 = journeystop.getString("depDate");

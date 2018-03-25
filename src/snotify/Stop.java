@@ -9,6 +9,7 @@ public class Stop {
 	public Stop(String time, String stopName) {
 		this.time = time;
 		this.stopName = stopName;
+		this.delay = 0;
 	}
 
 	public void setDelay(int delay) {

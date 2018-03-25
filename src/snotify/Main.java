@@ -74,7 +74,7 @@ public class Main {
 		trips.add(alingsas);
 		trips.add(vanersborg);
 		
-		String date = "2018-03-24";
+		String date = "2018-03-25";
 
 		ArrayList<PublicTransportation> transports = new ArrayList<PublicTransportation>();
 
