@@ -124,9 +124,9 @@ public class PublicTransportation {
 	public void setStops(JSONArray stops) {
 		for(int i = 0; i < stops.length(); i++) {
 			if(i < stops.length()-1)
-				this.stops.add(new Stop(stops.getJSONObject(i).getString("depTime"), stops.getJSONObject(i).getString("name")));
+				this.stops.add(new Stop(stops.getJSONObject(i).getString("depTime"), stops.getJSONObject(i).getString("name"),stops.getJSONObject(i).getString("id")));
 			else
-				this.stops.add(new Stop(stops.getJSONObject(i).getString("arrTime"), stops.getJSONObject(i).getString("name")));
+				this.stops.add(new Stop(stops.getJSONObject(i).getString("arrTime"), stops.getJSONObject(i).getString("name"),stops.getJSONObject(i).getString("id")));
 		}
 	}
 	
@@ -191,7 +191,7 @@ public class PublicTransportation {
 			if(!cancelled) {
 			writer.println("Station\t" + "Försening\t" + this.journeyid);
 			for(int i = 0; i < stops.size(); i++)
-				writer.println(stops.get(i).getStopName() + "\t" + delays.get(i));
+				writer.println(stops.get(i).getStopName() + "\t" + stops.get(i).getDelay());
 			}
 			else {
 				writer.println(this.journeyid);

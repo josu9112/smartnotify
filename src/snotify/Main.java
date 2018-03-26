@@ -74,14 +74,14 @@ public class Main {
 		trips.add(alingsas);
 		trips.add(vanersborg);
 		
-		String date = "2018-03-25";
+		String date = "2018-03-26";
 
 		ArrayList<PublicTransportation> transports = new ArrayList<PublicTransportation>();
 
 		for (int k = 0; k < trips.size(); k++) {
 			Trip temp = trips.get(k);
 			temp.setDate(date);
-			temp.setTime("00:00");
+			temp.setTime("08:00");
 			temp.setUseBus(false);
 			temp.setUseLongDistanceTrain(false);
 			temp.setUseRegionalTrain(false);
@@ -97,10 +97,12 @@ public class Main {
 							.equals(date)) {
 						notAllTrips = false;
 						break;
-					} else
-						transports.add(new PublicTransportation(new JourneyDetail(token, arr.getJSONObject(i)
-								.getJSONObject("Leg").getJSONObject("JourneyDetailRef").getString("ref"))));
-
+					} else {
+						PublicTransportation pt1 = new PublicTransportation(new JourneyDetail(token, arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("JourneyDetailRef").getString("ref")));
+						LocalTime time1 = new LocalTime();
+						if(compareTime(pt1.getStartTime(),time1.getHourOfDay()+":"+time1.getMinuteOfHour()))
+							transports.add(pt1);
+					}
 					if (i == arr.length() - 1) {
 						String time[] = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin")
 								.getString("time").split(":");

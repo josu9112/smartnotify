@@ -57,6 +57,8 @@ public class CheckJourney extends TimerTask {
 	
 	private void findNewLink() {
 		Trip trip = new Trip(pt.getJourneyDetail().getToken());
+		trip.setOriginId(pt.getStops().get(0).getStopId());
+		trip.setDestId(pt.getStops().get(pt.getStops().size()-1).getStopId());
 		trip.setDate(pt.getDate());
 		trip.setTime(pt.getStartTime());
 		trip.setUseBus(false);
