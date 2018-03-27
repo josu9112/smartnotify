@@ -14,7 +14,7 @@ public class connectDB {
 	public static Connection connection;
 	
 	public static void connectToDB() throws FileNotFoundException, SQLException {
-		Scanner scan = new Scanner(new FileReader("/home/rustax/Documents/dblogin.txt"));
+		Scanner scan = new Scanner(new FileReader("C:\\Users\\John\\Desktop\\dblogin.txt"));
 		String user = scan.nextLine();
 		user = user.substring(user.indexOf(" ")+1);
 		String pw = scan.nextLine();
