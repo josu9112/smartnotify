@@ -114,7 +114,7 @@ public class CheckJourney extends TimerTask {
 				}
 				continue;
 			}
-			if(arr.getJSONObject(i).getJSONObject("Leg").getString("id").equals(pt.getJourneyid())) {
+			if(arr.getJSONObject(i).getJSONObject("Leg").has("id") && arr.getJSONObject(i).getJSONObject("Leg").getString("id").equals(pt.getJourneyid())) {
 				if(arr.getJSONObject(i).getJSONObject("Leg").has("cancelled") && 
 						arr.getJSONObject(i).getJSONObject("Leg").getBoolean("cancelled") == true) {
 					pt.printJourney();
@@ -190,7 +190,7 @@ public class CheckJourney extends TimerTask {
 				}
 				continue;
 			}
-			if(arr.getJSONObject(i).getJSONObject("Leg").getString("id").equals(pt.getJourneyid())) {
+			if(arr.getJSONObject(i).getJSONObject("Leg").has("id") && arr.getJSONObject(i).getJSONObject("Leg").getString("id").equals(pt.getJourneyid())) {
 				if(arr.getJSONObject(i).getJSONObject("Leg").has("cancelled") && 
 						arr.getJSONObject(i).getJSONObject("Leg").getBoolean("cancelled") == true) {
 					pt.printJourney();
