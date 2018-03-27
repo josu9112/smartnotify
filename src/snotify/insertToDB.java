@@ -105,7 +105,7 @@ public class insertToDB {
 	
 	public static void insertToJourney(PublicTransportation PT) throws FileNotFoundException, SQLException, ParseException {
 		connectDB.connectToDB();
-		query = "INSERT INTO Journey (VasttrafikTripID, date, timeStart, timeEnd, weekDay, delayed, journeyNote, journeyCanceled)" + " values(?,?,?,?,?,?,?.?)";
+		query = "INSERT INTO Journey (VasttrafikTripID, `date`, timeStart, timeEnd, weekDay, `delayed`, journeyNote, journeyCanceled)" + " values(?,?,?,?,?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setDate(2, convertToDate(PT.getDate()));
 		prpSt.setTime(3, convertToTime(PT.getStartTime()));
@@ -147,11 +147,11 @@ public class insertToDB {
 	}
 	
 	private static void insertDelays(int JourID, ArrayList<Stop> Stops) throws SQLException, ParseException{
-		query = "INSERT INTO Delay (JourneyID, stopID, time, delay)" + " values(?,?,?,?)";
+		query = "INSERT INTO Delay (JourneyID, stopID, `time`, delay)" + " values(?,?,?,?)";
 		prpSt = connectDB.connection.prepareStatement(query);
 		prpSt.setInt(1, JourID);
 		for(int i = 0; i < Stops.size(); i++) {
-			sql = "SELECT stopID FROM Stop WHERE stopName = " + Stops.get(i).getStopName();
+			sql = "SELECT stopID FROM Stop WHERE stopName = '" + Stops.get(i).getStopName() + "'";
 			prpSt2 = connectDB.connection.prepareStatement(sql);
 			ResultSet stopID = prpSt2.executeQuery();
 			while(stopID.next()) {
