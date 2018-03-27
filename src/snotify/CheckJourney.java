@@ -3,7 +3,6 @@ package snotify;
 import java.io.IOException;
 import java.util.TimerTask;
 
-import org.joda.time.LocalTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,13 +91,13 @@ public class CheckJourney extends TimerTask {
 							this.cancel();
 							return;
 						}
-						else if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
+						if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
 							String message = arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Origin").getJSONObject("Notes").getJSONObject("Note").getString("$");
-							pt.setNote(message);
+							pt.setOriginNote(message);
 						}
-						else if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
+						if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
 							String message = arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Destination").getJSONObject("Notes").getJSONObject("Note").getString("$");
-							pt.setNote(message);
+							pt.setDestNote(message);
 						}
 						JourneyDetail temp = new JourneyDetail(pt.getJourneyDetail().getToken(),arr2.getJSONObject(i)
 								.getJSONObject("JourneyDetailRef").getString("ref"));
@@ -122,13 +121,13 @@ public class CheckJourney extends TimerTask {
 					this.cancel();
 					return;
 				}
-				else if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
+				if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
 					String message = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").getJSONObject("Notes").getJSONObject("Note").getString("$");
-					pt.setNote(message);
+					pt.setOriginNote(message);
 				}
-				else if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
+				if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
 					String message = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Destination").getJSONObject("Notes").getJSONObject("Note").getString("$");
-					pt.setNote(message);
+					pt.setDestNote(message);
 				}
 				JourneyDetail temp = new JourneyDetail(pt.getJourneyDetail().getToken(),arr.getJSONObject(i)
 						.getJSONObject("Leg").getJSONObject("JourneyDetailRef").getString("ref"));
@@ -178,13 +177,13 @@ public class CheckJourney extends TimerTask {
 							pt.printJourney();
 							this.cancel();
 						}
-						else if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
+						if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
 							String message = arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Origin").getJSONObject("Notes").getJSONObject("Note").getString("$");
-							pt.setNote(message);
+							pt.setOriginNote(message);
 						}
-						else if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
+						if(arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
 							String message = arr2.getJSONObject(j).getJSONObject("Leg").getJSONObject("Destination").getJSONObject("Notes").getJSONObject("Note").getString("$");
-							pt.setNote(message);
+							pt.setDestNote(message);
 						}
 						return;
 					}
@@ -197,20 +196,18 @@ public class CheckJourney extends TimerTask {
 					pt.printJourney();
 					this.cancel();
 				}
-				else if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
+				if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").has("Notes")) {
 					String message = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").getJSONObject("Notes").getJSONObject("Note").getString("$");
-					pt.setNote(message);
+					pt.setOriginNote(message);
 				}
-				else if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
+				if(arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Destination").has("Notes")) {
 					String message = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Destination").getJSONObject("Notes").getJSONObject("Note").getString("$");
-					pt.setNote(message);
+					pt.setDestNote(message);
 				}
 				return;
 			}
 		}
 	}
-	
-	
 	
 	
 	private int calcTimeDifference(JSONObject journeystop) {

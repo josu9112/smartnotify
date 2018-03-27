@@ -39,7 +39,8 @@ public class PublicTransportation {
 	private JourneyDetail journeyDetail;
 	private ArrayList<String> days;
 	private boolean cancelled;
-	private String note;
+	private String originNote;
+	private String destNote;
 
 	public PublicTransportation(JourneyDetail journeyDetail) throws JSONException, IOException  {
 		this.journeyDetail = journeyDetail;
@@ -65,7 +66,8 @@ public class PublicTransportation {
 		days.add(ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depDate"));
 		this.weekday = determineWeekday(this.date);
 		this.cancelled = false;
-		this.note = "";
+		this.originNote = "";
+		this.destNote = "";
 	}
 		
 	
@@ -187,12 +189,20 @@ public class PublicTransportation {
 		this.cancelled = cancelled;
 	}
 	
-	public void setNote(String note) {
-		this.note = note;
+	public void setOriginNote(String note) {
+		this.originNote = note;
 	}
 	
 	public String getNote() {
-		return this.note;
+		return this.originNote;
+	}
+	
+	public void setDestNote(String note) {
+		this.destNote = note;
+	}
+	
+	public String getDestNote() {
+		return this.destNote;
 	}
 	
 	public void printJourney() {
@@ -207,8 +217,10 @@ public class PublicTransportation {
 				writer.println(this.journeyid);
 				writer.println("Cancelled");
 			}
-			if(!note.equals(""))
-				writer.println("Note: " + this.note);
+			if(!originNote.equals(""))
+				writer.println("Orgin note: " + this.originNote);
+			if(!destNote.equals(""))
+				writer.println("Dest note: " + this.destNote);
 			writer.close();
 		} catch (FileNotFoundException e) {
 		}
