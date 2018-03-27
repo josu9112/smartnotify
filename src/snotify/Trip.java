@@ -724,8 +724,4 @@ public class Trip {
 		
 		return requestLink + "&format=json";
 	}
-	
-	
-	
-	
 }
