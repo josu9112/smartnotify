@@ -41,7 +41,7 @@ public class CheckJourney extends TimerTask {
 			}
 			while(!arr.getJSONObject(whatStop).has("rtDepTime") && !arr.getJSONObject(whatStop).has("rtArrTime")) {
 				if(arr.getJSONObject(whatStop).getInt("routeIdx") == obj.getJSONObject("JourneyDetail").getJSONObject("JourneyType").getInt("routeIdxTo")) {
-					pt.printJourney();	//Journey ended, prints it out
+					pt.logJourneyToDB();	//Journey ended, to DB
 					this.cancel();
 					return;
 				}
