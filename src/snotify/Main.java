@@ -78,16 +78,16 @@ public class Main {
 		ArrayList<PublicTransportation> transports = new ArrayList<PublicTransportation>();
 
 		for (int k = 0; k < trips.size(); k++) {
-			System.out.println("Station: " + k);
+//			System.out.println("Station: " + k);
 			Trip temp = trips.get(k);
-			for (int j = 0; j < 7; j++) {
-				System.out.println("Dag: " + j);
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DATE, -1 + j);
-				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-				String date = format1.format(cal.getTime());
+//			for (int j = 0; j < 7; j++) {
+//				System.out.println("Dag: " + j);
+//				Calendar cal = Calendar.getInstance();
+//				cal.add(Calendar.DATE, -1 + j);
+//				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+				String date = "2018-03-27";
 				temp.setDate(date);
-				temp.setTime("00:00");
+				temp.setTime("22:30");
 				temp.setUseBus(false);
 				temp.setUseLongDistanceTrain(false);
 				temp.setUseRegionalTrain(false);
@@ -111,9 +111,12 @@ public class Main {
 								break;
 							} else {
 								try {
-									transports.add(new PublicTransportation(
+									PublicTransportation pt1 = new PublicTransportation(
 											new JourneyDetail(token, arr.getJSONObject(i).getJSONObject("Leg")
-													.getJSONObject("JourneyDetailRef").getString("ref"))));
+													.getJSONObject("JourneyDetailRef").getString("ref")));
+									LocalTime lTime = new LocalTime();
+									if(compareTime(pt1.getStartTime(), lTime.getHourOfDay() + ":" + lTime.getMinuteOfHour()))
+										transports.add(pt1);
 								} catch (JSONException | IOException e) {
 									System.out.println(e.getMessage());
 								}
@@ -145,8 +148,12 @@ public class Main {
 							break;
 						} else {
 							try {
-								transports.add(new PublicTransportation(new JourneyDetail(token,
-										obj.getJSONObject("Leg").getJSONObject("JourneyDetailRef").getString("ref"))));
+								PublicTransportation pt1 = new PublicTransportation(
+										new JourneyDetail(token, obj.getJSONObject("Leg")
+												.getJSONObject("JourneyDetailRef").getString("ref")));
+								LocalTime lTime = new LocalTime();
+								if(compareTime(pt1.getStartTime(), lTime.getHourOfDay() + ":" +lTime.getMinuteOfHour()))
+									transports.add(pt1);
 							} catch (JSONException | IOException e2) {
 								System.out.println(e2.getMessage());
 							}
@@ -165,57 +172,36 @@ public class Main {
 					if (!notAllTrips)
 						break;
 				}
-			}
-		}
-
-		ArrayList<String> allstops = new ArrayList<String>();
-		ArrayList<PublicTransportation> added = new ArrayList<PublicTransportation>();
-//		PrintWriter writer = new PrintWriter("vasttaglinjer.csv");
-//		writer.print("Totaltime," + "Distance," + "nrOfStops," + "[Stops]");
-		for (PublicTransportation a : transports) {
-			Boolean exists = false;
-			for(int i = 0; i < added.size(); i++) {
-				if(added.get(i).getTotalTime() == a.getTotalTime() && added.get(i).getStops().size() == a.getStops().size()
-						&& added.get(i).getStops().get(0).getStopName().equals(a.getStops().get(0).getStopName()) &&
-						added.get(i).getStops().get(added.get(i).getStops().size()-1).getStopName().equals(a.getStops().get(a.getStops().size()-1).getStopName())) {
-					exists = true;
-					break;
-				}
-			}
-			if(exists)
-				continue;
-			
-			added.add(a);
-			try {
-				insertToDB.insertInit((int)a.getDistance(), a.getTotalTime(), a.getStops());
-			} catch (SQLException e) {
-				System.out.println(e.getMessage());
-			}
-//			writer.println();
-//			writer.print(a.getTotalTime());
-//			writer.print("," + ((int) a.getDistance()));
-//			writer.print("," + a.getStops().size() + ",");
-//			ArrayList<Stop> stops = a.getStops();
-//			for (int i = 0; i < stops.size(); i++) {
-//				
-//				
-//				if (!allstops.contains(stops.get(i).getStopName()))
-//					allstops.add(stops.get(i).getStopName());
-//
-//				if (i == 0)
-//					writer.print("[\"" + stops.get(i).getStopName() + "\",");
-//				else if (i == stops.size() - 1) {
-//					writer.print("\"" + stops.get(i).getStopName() + "\"]");
-//				} else
-//					writer.print("\"" + stops.get(i).getStopName() + "\",");
 //			}
 		}
-//		writer.close();
-//
-//		PrintWriter writerstops = new PrintWriter("allstops.csv");
-//		for (String a : allstops)
-//			writerstops.println(a);
-//		writerstops.close();
+
+		for(PublicTransportation a : transports) {
+			Timer timer = new Timer();
+			timer.schedule(new CheckJourney(a), getDate(a), 60*1000);
+		}
+		
+//		ArrayList<String> allstops = new ArrayList<String>();
+//		ArrayList<PublicTransportation> added = new ArrayList<PublicTransportation>();
+//		for (PublicTransportation a : transports) {
+//			Boolean exists = false;
+//			for(int i = 0; i < added.size(); i++) {
+//				if(added.get(i).getTotalTime() == a.getTotalTime() && added.get(i).getStops().size() == a.getStops().size()
+//						&& added.get(i).getStops().get(0).getStopName().equals(a.getStops().get(0).getStopName()) &&
+//						added.get(i).getStops().get(added.get(i).getStops().size()-1).getStopName().equals(a.getStops().get(a.getStops().size()-1).getStopName())) {
+//					exists = true;
+//					break;
+//				}
+//			}
+//			if(exists)
+//				continue;
+//			
+//			added.add(a);
+//			try {
+//				insertToDB.insertInit((int)a.getDistance(), a.getTotalTime(), a.getStops());
+//			} catch (SQLException e) {
+//				System.out.println(e.getMessage());
+//			}
+//		}
 
 		// for(PublicTransportation a : transports) {
 		// System.out.println(a.getLinje() + "\t" + a.getStartStopName() + "\t" +

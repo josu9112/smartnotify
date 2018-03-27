@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,7 @@ public class PublicTransportation {
 	private boolean cancelled;
 	private String originNote;
 	private String destNote;
+	private String endtime;
 
 	public PublicTransportation(JourneyDetail journeyDetail) throws JSONException, IOException  {
 		this.journeyDetail = journeyDetail;
@@ -59,6 +61,7 @@ public class PublicTransportation {
 		this.date = ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depDate");
 		this.distance = calcDistance(gem.executeRequest().getJSONObject("Geometry").getJSONObject("Points").getJSONArray("Point"));
 		this.startTime = ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(0).getString("depTime");
+		this.endtime = ob.getJSONObject("JourneyDetail").getJSONArray("Stop").getJSONObject(this.stops.size()-1).getString("arrTime");
 		this.currentStop = 0;
 		this.delays = new ArrayList<Integer>();
 		this.totalTime = calcJourneyTime(ob.getJSONObject("JourneyDetail").getJSONArray("Stop"));
@@ -189,11 +192,15 @@ public class PublicTransportation {
 		this.cancelled = cancelled;
 	}
 	
+	public boolean getCancelled() {
+		return this.cancelled;
+	}
+	
 	public void setOriginNote(String note) {
 		this.originNote = note;
 	}
 	
-	public String getNote() {
+	public String getOriginNote() {
 		return this.originNote;
 	}
 	
@@ -204,6 +211,29 @@ public class PublicTransportation {
 	public String getDestNote() {
 		return this.destNote;
 	}
+	
+	public String getEndTime() {
+		return this.endtime;
+	}
+	
+	/**
+	 * Checks if journey was delayed, partly delayed or not delayed.
+	 * @return Delayed = 1. Partly delayed = -1. Not delayed = 0.
+	 */
+	public int isDelayed() {
+		if(this.stops.get(this.stops.size()-1).getDelay()>0) {
+			return 1;
+		}
+		else {
+			for(Stop a : this.stops) {
+				if(a.getDelay()>0) {
+					return -1;
+				}
+			}
+			return 0;
+		}
+	}
+	
 	
 	public void printJourney() {
 		try {
@@ -223,6 +253,15 @@ public class PublicTransportation {
 				writer.println("Dest note: " + this.destNote);
 			writer.close();
 		} catch (FileNotFoundException e) {
+		}
+	}
+	
+	
+	public void logJourneyToDB() {
+		try {
+			insertToDB.insertToJourney(this);
+		} catch (FileNotFoundException | SQLException | ParseException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 	
