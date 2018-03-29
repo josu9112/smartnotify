@@ -40,149 +40,148 @@ public class Main {
 		scan.close();
 		Token token = new Token(id, secret);
 		
-//		Timer timer = new Timer();
-//		timer.schedule(new CollectJourneys(token), 1440*60*1000);
+		new CollectJourneys(token);
 
-		ArrayList<Trip> trips = new ArrayList<Trip>();
-		Trip gbg1 = new Trip(token);
-		gbg1.setOriginId("9021014008000000");
-		gbg1.setDestId("9021014019110000");
-		Trip gbg2 = new Trip(token);
-		gbg2.setOriginId("9021014008000000");
-		gbg2.setDestId("9021014016611000");
-		Trip gbg3 = new Trip(token);
-		gbg3.setOriginId("9021014008000000");
-		gbg3.setDestId("9021014017510000");
-		Trip gbg4 = new Trip(token);
-		gbg4.setOriginId("9021014008000000");
-		gbg4.setDestId("9021014080802000");
-		Trip kba = new Trip(token);
-		kba.setOriginId("9021014019110000");
-		kba.setDestId("9021014008000000");
-		Trip alvangen = new Trip(token);
-		alvangen.setOriginId("9021014016611000");
-		alvangen.setDestId("9021014008000000");
-		Trip alingsas = new Trip(token);
-		alingsas.setOriginId("9021014017510000");
-		alingsas.setDestId("9021014008000000");
-		Trip vanersborg = new Trip(token);
-		vanersborg.setOriginId("9021014080802000");
-		vanersborg.setDestId("9021014008000000");
+//		ArrayList<Trip> trips = new ArrayList<Trip>();
+//		Trip gbg1 = new Trip(token);
+//		gbg1.setOriginId("9021014008000000");
+//		gbg1.setDestId("9021014019110000");
+//		Trip gbg2 = new Trip(token);
+//		gbg2.setOriginId("9021014008000000");
+//		gbg2.setDestId("9021014016611000");
+//		Trip gbg3 = new Trip(token);
+//		gbg3.setOriginId("9021014008000000");
+//		gbg3.setDestId("9021014017510000");
+//		Trip gbg4 = new Trip(token);
+//		gbg4.setOriginId("9021014008000000");
+//		gbg4.setDestId("9021014080802000");
+//		Trip kba = new Trip(token);
+//		kba.setOriginId("9021014019110000");
+//		kba.setDestId("9021014008000000");
+//		Trip alvangen = new Trip(token);
+//		alvangen.setOriginId("9021014016611000");
+//		alvangen.setDestId("9021014008000000");
+//		Trip alingsas = new Trip(token);
+//		alingsas.setOriginId("9021014017510000");
+//		alingsas.setDestId("9021014008000000");
+//		Trip vanersborg = new Trip(token);
+//		vanersborg.setOriginId("9021014080802000");
+//		vanersborg.setDestId("9021014008000000");
+//
+//		trips.add(gbg1);
+//		trips.add(gbg2);
+//		trips.add(gbg3);
+//		trips.add(gbg4);
+//		trips.add(kba);
+//		trips.add(alvangen);
+//		trips.add(alingsas);
+//		trips.add(vanersborg);
+//
+//		ArrayList<PublicTransportation> transports = new ArrayList<PublicTransportation>();
 
-		trips.add(gbg1);
-		trips.add(gbg2);
-		trips.add(gbg3);
-		trips.add(gbg4);
-		trips.add(kba);
-		trips.add(alvangen);
-		trips.add(alingsas);
-		trips.add(vanersborg);
-
-		ArrayList<PublicTransportation> transports = new ArrayList<PublicTransportation>();
-
-		for (int k = 0; k < trips.size(); k++) {
+//		for (int k = 0; k < trips.size(); k++) {
 //			System.out.println("Station: " + k);
-			Trip temp = trips.get(k);
+//			Trip temp = trips.get(k);
 //			for (int j = 0; j < 7; j++) {
 //				System.out.println("Dag: " + j);
 //				Calendar cal = Calendar.getInstance();
 //				cal.add(Calendar.DATE, -1 + j);
 //				SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-				String date = "2018-03-27";
-				temp.setDate(date);
-				temp.setTime("22:30");
-				temp.setUseBus(false);
-				temp.setUseLongDistanceTrain(false);
-				temp.setUseRegionalTrain(false);
-				temp.setUseTram(false);
-				temp.setMaxChanges(0);
-
-				Boolean notAllTrips = true;
-				while (notAllTrips) {
-					JSONObject obj = null;
-					try {
-						obj = temp.executeRequest().getJSONObject("TripList");
-					} catch (JSONException | IOException e1) {
-						System.out.println(e1.getMessage());
-					}
-					try {
-						JSONArray arr = obj.getJSONArray("Trip");
-						for (int i = 0; i < arr.length(); i++) {
-							if (!arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").getString("date")
-									.equals(date)) {
-								notAllTrips = false;
-								break;
-							} else {
-								try {
-									PublicTransportation pt1 = new PublicTransportation(
-											new JourneyDetail(token, arr.getJSONObject(i).getJSONObject("Leg")
-													.getJSONObject("JourneyDetailRef").getString("ref")));
+//				String date = "2018-03-27";
+//				temp.setDate(date);
+//				temp.setTime("22:30");
+//				temp.setUseBus(false);
+//				temp.setUseLongDistanceTrain(false);
+//				temp.setUseRegionalTrain(false);
+//				temp.setUseTram(false);
+//				temp.setMaxChanges(0);
+//
+//				Boolean notAllTrips = true;
+//				while (notAllTrips) {
+//					JSONObject obj = null;
+//					try {
+//						obj = temp.executeRequest().getJSONObject("TripList");
+//					} catch (JSONException | IOException e1) {
+//						System.out.println(e1.getMessage());
+//					}
+//					try {
+//						JSONArray arr = obj.getJSONArray("Trip");
+//						for (int i = 0; i < arr.length(); i++) {
+//							if (!arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").getString("date")
+//									.equals(date)) {
+//								notAllTrips = false;
+//								break;
+//							} else {
+//								try {
+//									PublicTransportation pt1 = new PublicTransportation(
+//											new JourneyDetail(token, arr.getJSONObject(i).getJSONObject("Leg")
+//													.getJSONObject("JourneyDetailRef").getString("ref")));
 //									LocalTime lTime = new LocalTime();
 //									if(compareTime(pt1.getStartTime(), lTime.getHourOfDay() + ":" + lTime.getMinuteOfHour()))
-										transports.add(pt1);
-								} catch (JSONException | IOException e) {
-									System.out.println(e.getMessage());
-								}
-							}
-							if (i == arr.length() - 1) {
-								String time[] = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin")
-										.getString("time").split(":");
-								int hours = Integer.parseInt(time[0]);
-								int minutes = Integer.parseInt(time[1]);
-								int totalTime = (hours * 60) + minutes + 1;
-								hours = (totalTime / 60) % 24;
-								minutes = totalTime % 60;
-								if (minutes < 10)
-									temp.setTime(hours + ":0" + minutes);
-								else
-									temp.setTime(hours + ":" + minutes);
-							}
-						}
-						if (!notAllTrips)
-							break;
-					} catch (Exception e) {
-						try {
-						obj = obj.getJSONObject("Trip");
-						}catch(Exception e3) {
-							break;
-						}
-						if (!obj.getJSONObject("Leg").getJSONObject("Origin").getString("date").equals(date)) {
-							notAllTrips = false;
-							break;
-						} else {
-							try {
-								PublicTransportation pt1 = new PublicTransportation(
-										new JourneyDetail(token, obj.getJSONObject("Leg")
-												.getJSONObject("JourneyDetailRef").getString("ref")));
+//										transports.add(pt1);
+//								} catch (JSONException | IOException e) {
+//									System.out.println(e.getMessage());
+//								}
+//							}
+//							if (i == arr.length() - 1) {
+//								String time[] = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin")
+//										.getString("time").split(":");
+//								int hours = Integer.parseInt(time[0]);
+//								int minutes = Integer.parseInt(time[1]);
+//								int totalTime = (hours * 60) + minutes + 1;
+//								hours = (totalTime / 60) % 24;
+//								minutes = totalTime % 60;
+//								if (minutes < 10)
+//									temp.setTime(hours + ":0" + minutes);
+//								else
+//									temp.setTime(hours + ":" + minutes);
+//							}
+//						}
+//						if (!notAllTrips)
+//							break;
+//					} catch (Exception e) {
+//						try {
+//						obj = obj.getJSONObject("Trip");
+//						}catch(Exception e3) {
+//							break;
+//						}
+//						if (!obj.getJSONObject("Leg").getJSONObject("Origin").getString("date").equals(date)) {
+//							notAllTrips = false;
+//							break;
+//						} else {
+//							try {
+//								PublicTransportation pt1 = new PublicTransportation(
+//										new JourneyDetail(token, obj.getJSONObject("Leg")
+//												.getJSONObject("JourneyDetailRef").getString("ref")));
 //								LocalTime lTime = new LocalTime();
 //								if(compareTime(pt1.getStartTime(), lTime.getHourOfDay() + ":" +lTime.getMinuteOfHour()))
-									transports.add(pt1);
-							} catch (JSONException | IOException e2) {
-								System.out.println(e2.getMessage());
-							}
-						}
-						String time[] = obj.getJSONObject("Leg").getJSONObject("Origin").getString("time").split(":");
-						int hours = Integer.parseInt(time[0]);
-						int minutes = Integer.parseInt(time[1]);
-						int totalTime = (hours * 60) + minutes + 1;
-						hours = (totalTime / 60) % 24;
-						minutes = totalTime % 60;
-						if (minutes < 10)
-							temp.setTime(hours + ":0" + minutes);
-						else
-							temp.setTime(hours + ":" + minutes);
-					}
-					if (!notAllTrips)
-						break;
-				}
+//									transports.add(pt1);
+//							} catch (JSONException | IOException e2) {
+//								System.out.println(e2.getMessage());
+//							}
+//						}
+//						String time[] = obj.getJSONObject("Leg").getJSONObject("Origin").getString("time").split(":");
+//						int hours = Integer.parseInt(time[0]);
+//						int minutes = Integer.parseInt(time[1]);
+//						int totalTime = (hours * 60) + minutes + 1;
+//						hours = (totalTime / 60) % 24;
+//						minutes = totalTime % 60;
+//						if (minutes < 10)
+//							temp.setTime(hours + ":0" + minutes);
+//						else
+//							temp.setTime(hours + ":" + minutes);
+//					}
+//					if (!notAllTrips)
+//						break;
+//				}
 //			}
-		}
+//		}
 
-		for(PublicTransportation a : transports) {
+//		for(PublicTransportation a : transports) {
 //			Timer timer = new Timer();
 //			timer.schedule(new CheckJourney(a), getDate(a), 60*1000);
-			a.logJourneyToDB();
-		}
+//			a.logJourneyToDB();
+//		}
 		
 //		ArrayList<String> allstops = new ArrayList<String>();
 //		ArrayList<PublicTransportation> added = new ArrayList<PublicTransportation>();
@@ -535,9 +534,8 @@ public class Main {
 		// writer2.close();
 
 	}
-
+	
 	private static long checkDate(PublicTransportation temp) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

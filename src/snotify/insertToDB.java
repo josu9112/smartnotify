@@ -125,9 +125,9 @@ public class insertToDB {
 		sql = "SELECT VasttrafikTrip.VasttrafikTripID FROM VasttrafikTrip INNER JOIN TripStops ON "
 				+ "(TripStops.VasttrafikTripID = VasttrafikTrip.VasttrafikTripID) WHERE "
 				+ "VasttrafikTrip.totalTime = " + PT.getTotalTime() +
-				" AND VasttrafikTrip.nrOfStops = " + PT.getStops().size() + " AND (TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = '" + PT.getStartStopName()
+				" AND VasttrafikTrip.nrOfStops = " + PT.getStops().size() + " AND ((TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = '" + PT.getStartStopName()
 				+ "') AND TripStops.number = 1) OR (TripStops.stopID = (SELECT stopID FROM Stop WHERE stopName = '" + PT.getEndStopName() + "')"
-				+ " AND TripStops.number = " + PT.getStops().size() + ") HAVING COUNT(TripStops.stopID) = 2;";
+				+ " AND TripStops.number = " + PT.getStops().size() + ")) HAVING COUNT(TripStops.stopID) = 2;";
 		prpSt2 = connectDB.connection.prepareStatement(sql);
 		ResultSet tripID = prpSt2.executeQuery();
 		while(tripID.next()) {

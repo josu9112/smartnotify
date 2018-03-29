@@ -12,10 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CollectJourneys extends TimerTask {
+public class CollectJourneys {
 
+	private Trip temp;
 	private ArrayList<Trip> trips;
+	private ArrayList<PublicTransportation> transports;
 	private Token token;
+	private String date;
 
 	public CollectJourneys(Token token) {
 		this.token = token;
@@ -53,20 +56,21 @@ public class CollectJourneys extends TimerTask {
 		trips.add(alvangen);
 		trips.add(alingsas);
 		trips.add(vanersborg);
+		
+		runMethod();
 	}
 
-	@Override
-	public void run() {
-		
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.DATE,1);
-		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
-		String date = format1.format(cal.getTime());
+	public void runMethod() {
 
-		ArrayList<PublicTransportation> transports = new ArrayList<PublicTransportation>();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, 1);
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		date = format1.format(cal.getTime());
+
+		transports = new ArrayList<PublicTransportation>();
 
 		for (int k = 0; k < trips.size(); k++) {
-			Trip temp = trips.get(k);
+			temp = trips.get(k);
 			temp.setDate(date);
 			temp.setTime("00:00");
 			temp.setUseBus(false);
@@ -77,41 +81,39 @@ public class CollectJourneys extends TimerTask {
 
 			Boolean notAllTrips = true;
 			while (notAllTrips) {
-				JSONObject obj = null;
+				JSONObject jsonobj = null;
 				try {
-					obj = temp.executeRequest().getJSONObject("TripList");
-				} catch (JSONException | IOException e1) {
-					System.out.println(e1.getMessage());
+					jsonobj = temp.executeRequest().getJSONObject("TripList");
+				} catch (JSONException | IOException e) {
+					break;
 				}
-				JSONArray arr = obj.getJSONArray("Trip");
-				for (int i = 0; i < arr.length(); i++) {
-					if (!arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin").getString("date")
-							.equals(date)) {
-						notAllTrips = false;
-						break;
-					} else {
-						try {
-							transports.add(new PublicTransportation(new JourneyDetail(token, arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("JourneyDetailRef").getString("ref"))));
-						} catch (JSONException | IOException e) {
-							System.out.println(e.getMessage());
+				Object trip = null;
+				try {
+					trip = jsonobj.get("Trip");
+				}catch(Exception e) {
+					System.out.println(e.getMessage());
+					break;
+				}
+				JSONArray  tripArray;
+				JSONObject tripObject;
+				if(trip instanceof JSONArray) {
+					tripArray = (JSONArray)trip;
+					for (int i = 0; i < tripArray.length(); i++) {
+						if(!checkJSONObject(tripArray.getJSONObject(i))) {
+							notAllTrips = false;
+							break;
 						}
 					}
-					if (i == arr.length() - 1) {
-						String time[] = arr.getJSONObject(i).getJSONObject("Leg").getJSONObject("Origin")
-								.getString("time").split(":");
-						int hours = Integer.parseInt(time[0]);
-						int minutes = Integer.parseInt(time[1]);
-						int totalTime = (hours * 60) + minutes + 1;
-						hours = (totalTime / 60) % 24;
-						minutes = totalTime % 60;
-						if (minutes < 10)
-							temp.setTime(hours + ":0" + minutes);
-						else
-							temp.setTime(hours + ":" + minutes);
-					}
 				}
-				if (!notAllTrips)
+				else if(trip instanceof JSONObject) {
+					tripObject = (JSONObject)trip;
+					if(!checkJSONObject(tripObject))
+						break;
+				}
+				else {
+					System.out.println("Ingen array eller object");
 					break;
+				}
 			}
 		}
 
@@ -119,7 +121,37 @@ public class CollectJourneys extends TimerTask {
 			Timer timer = new Timer();
 			timer.schedule(new CheckJourney(a), getDate(a), 60 * 1000);
 		}
+		System.out.println("Journeys collected");
 	}
+
+	private boolean checkJSONObject(JSONObject tripObject) {
+		if (!tripObject.getJSONObject("Leg").getJSONObject("Origin").getString("date")
+				.equals(this.date)) {
+			return false;
+		} else {
+			try {
+				transports.add(new PublicTransportation(new JourneyDetail(this.token, tripObject.getJSONObject("Leg")
+						.getJSONObject("JourneyDetailRef").getString("ref"))));
+			} catch (JSONException | IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		String time[] = tripObject.getJSONObject("Leg").getJSONObject("Origin")
+				.getString("time").split(":");
+		int hours = Integer.parseInt(time[0]);
+		int minutes = Integer.parseInt(time[1]);
+		int totalTime = (hours * 60) + minutes + 1;
+		hours = (totalTime / 60) % 24;
+		minutes = totalTime % 60;
+		if (minutes < 10)
+			temp.setTime(hours + ":0" + minutes);
+		else
+			temp.setTime(hours + ":" + minutes);
+		return true;
+	}
+	
+	
+	
 	
 	public static Date getDate(PublicTransportation pt) {
 		Calendar cal = Calendar.getInstance();
